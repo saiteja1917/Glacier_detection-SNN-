@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Glacier Lake Detection - SNN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1f27, #28303d, #1a1f27);
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .logo {
+            margin: 20px auto;
+            width: 200px;
+            height: 200px;
+            background: url('/static/images/logo.png') no-repeat center/contain;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        .upload-form {
+            margin-top: 10px;
+        }
+        .file-input {
+            padding: 15px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 2px solid #4caf50;
+            background-color: #2a2e38;
+            color: #eee;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .file-input:hover {
+            background-color: #353b49;
+        }
+        button {
+            background: #4caf50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            justify-items: center;
+            margin: 25px auto;
+            max-width: 700px;
+        }
+        .grid-item {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            width: 100%;
+            text-align: center;
+        }
+        .grid-item img {
+            width: 100%;
+            border-radius: 8px;
+            display: block;
+        }
+        .loader {
+            display: none;
+            margin: 20px auto;
+            color: #4caf50;
+        }
+        .alert {
+            color: yellow;
+            margin-top: 10px;
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .grid-item img {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo"></div>
+    <h1>Glacier Lake Detection using Spiking Neural Networks</h1>
+
+    <form class="upload-form" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+        <input class="file-input" type="file" name="file" id="fileInput">
+        <br>
+        <button type="submit">Predict</button>
+        <div class="alert" id="alert">⚠️ Please select a file before predicting!</div>
+    </form>
+
+    <div class="loader" id="loader">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p>Predicting, please wait...</p>
+    </div>
+
+    {% if original %}
+    <h2 style="margin-top: 25px;">Detection Results:</h2>
+    <div class="grid-container">
+        <div class="grid-item">
+            <p>Original Image</p>
+            <img src="{{ url_for('static', filename=original) }}" alt="Original">
+        </div>
+        <div class="grid-item">
+            <p>Grayscale Image</p>
+            <img src="{{ url_for('static', filename=grayscale) }}" alt="Grayscale">
+        </div>
+        <div class="grid-item">
+            <p>Spike Encoded Image</p>
+            <img src="{{ url_for('static', filename=spike) }}" alt="Spike">
+        </div>
+        <div class="grid-item">
+            <p>Predicted Output</p>
+            <img src="{{ url_for('static', filename=predicted) }}" alt="Prediction">
+        </div>
+    </div>
+
+    {% if accuracy is not none %}
+    <p style="color: lightgreen; font-size: 18px; margin-top:20px;">Accuracy: {{ accuracy | round(4) }}</p>
+    {% endif %}
+    {% endif %}
+
+<script>
+    function validateForm() {
+        let fileInput = document.getElementById('fileInput');
+        let alertBox = document.getElementById('alert');
+        let loader = document.getElementById('loader');
+        if (!fileInput.value) {
+            alertBox.style.display = 'block';
+            return false;
+        }
+        alertBox.style.display = 'none';
+        loader.style.display = 'block';
+        return true;
+    }
+</script>
+
+</body>
+</html>
